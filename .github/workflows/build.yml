@@ -32,7 +32,6 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version: 'stable'
-      - run: go generate ./....
       - run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
       - uses: codecov/codecov-action@v5
         with:
