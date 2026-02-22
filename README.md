@@ -84,26 +84,6 @@ func main() {
 }
 ```
 
-## JSON configuration
-
-Config can be loaded from a JSON file, which is useful for CI/CD:
-
-```json
-{
-  "source_dir": "./dist",
-  "output_path": "MyApp.dmg",
-  "volume_name": "My App",
-  "filesystem": "HFS+",
-  "image_format": "UDZO",
-  "signing_identity": "Developer ID Application: Example Inc",
-  "notarize_credentials": "AC_PASSWORD"
-}
-```
-
-```go
-cfg, err := hdiutil.LoadConfig("dmg.json")
-```
-
 ## Sandbox-safe images
 
 ```go

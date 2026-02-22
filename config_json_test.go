@@ -2,8 +2,6 @@ package hdiutil_test
 
 import (
 	"bytes"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"al.essio.dev/pkg/hdiutil"
@@ -100,21 +98,3 @@ func TestConfig_FromJSON_Partial(t *testing.T) {
 	}
 }
 
-func TestLoadConfig(t *testing.T) {
-	t.Parallel()
-
-	tmpFile := filepath.Join(t.TempDir(), "config.json")
-	jsonStr := `{"volume_name": "TestFile", "output_path": "file.dmg", "source_dir": "src"}`
-	if err := os.WriteFile(tmpFile, []byte(jsonStr), 0644); err != nil {
-		t.Fatalf("Failed to create temp config file: %v", err)
-	}
-
-	cfg, err := hdiutil.LoadConfig(tmpFile)
-	if err != nil {
-		t.Fatalf("LoadConfig failed: %v", err)
-	}
-
-	if cfg.VolumeName != "TestFile" {
-		t.Errorf("Expected VolumeName 'TestFile', got '%s'", cfg.VolumeName)
-	}
-}

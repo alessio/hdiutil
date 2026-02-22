@@ -2,8 +2,6 @@ package hdiutil_test
 
 import (
 	"errors"
-	"fmt"
-	"os"
 	"strings"
 	"testing"
 
@@ -14,7 +12,7 @@ import (
 type mockExecutor struct {
 	commands    []executedCommand
 	runErr      error
-	runOutputFn func(name string, args ...string) (string, error)
+	runOutputFn func(_ string, args ...string) (string, error)
 }
 
 type executedCommand struct {
@@ -637,40 +635,6 @@ func TestStart_SandboxSafeMakehybridFails(t *testing.T) {
 	}
 }
 
-func TestLoadConfig_NonExistentFile(t *testing.T) {
-	t.Parallel()
-	_, err := hdiutil.LoadConfig("/nonexistent/path/config.json")
-	if err == nil {
-		t.Error("LoadConfig() should fail for non-existent file")
-	}
-}
-
-func TestLoadConfig_InvalidJSON(t *testing.T) {
-	t.Parallel()
-	tmpFile := fmt.Sprintf("%s/invalid.json", t.TempDir())
-	if err := writeTestFile(t, tmpFile, "not valid json{{{"); err != nil {
-		t.Fatal(err)
-	}
-
-	_, err := hdiutil.LoadConfig(tmpFile)
-	if err == nil {
-		t.Error("LoadConfig() should fail for invalid JSON")
-	}
-}
-
-func TestLoadConfig_EmptyFile(t *testing.T) {
-	t.Parallel()
-	tmpFile := fmt.Sprintf("%s/empty.json", t.TempDir())
-	if err := writeTestFile(t, tmpFile, ""); err != nil {
-		t.Fatal(err)
-	}
-
-	_, err := hdiutil.LoadConfig(tmpFile)
-	if err == nil {
-		t.Error("LoadConfig() should fail for empty file")
-	}
-}
-
 func TestDetachDiskImage_SimulateMode(t *testing.T) {
 	t.Parallel()
 	mock := &mockExecutor{}
@@ -732,7 +696,3 @@ func TestAttachDiskImage_MountPointWithWhitespace(t *testing.T) {
 	}
 }
 
-func writeTestFile(t *testing.T, path, content string) error {
-	t.Helper()
-	return os.WriteFile(path, []byte(content), 0644)
-}

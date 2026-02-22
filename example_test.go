@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"al.essio.dev/pkg/hdiutil"
@@ -236,34 +235,6 @@ func ExampleConfig_FromJSON() {
 	// MyApp.dmg
 	// My App
 	// ULFO
-}
-
-func ExampleLoadConfig() {
-	dir, err := os.MkdirTemp("", "example-*")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer os.RemoveAll(dir)
-
-	path := filepath.Join(dir, "dmg.json")
-	data := []byte(`{"source_dir":"./dist","output_path":"App.dmg","volume_name":"App"}`)
-	if err := os.WriteFile(path, data, 0644); err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	cfg, err := hdiutil.LoadConfig(path)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println(cfg.VolumeName)
-	fmt.Println(cfg.OutputPath)
-	// Output:
-	// App
-	// App.dmg
 }
 
 func ExampleNew() {

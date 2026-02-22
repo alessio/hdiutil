@@ -22,12 +22,9 @@
 // # Configuration
 //
 // A [Config] struct holds all settings for image creation. It can be built
-// programmatically or loaded from a JSON file with [LoadConfig]:
-//
-//	cfg, err := hdiutil.LoadConfig("dmg.json")
-//
-// Configs can also be serialized and deserialized with [Config.ToJSON] and
-// [Config.FromJSON] for round-tripping through pipelines or storage.
+// programmatically or deserialized from JSON with [Config.FromJSON].
+// Configs can also be serialized with [Config.ToJSON] for round-tripping
+// through pipelines or storage.
 //
 // [Config.Validate] must be called (either directly or implicitly through
 // [Runner.Setup]) before the lazy option functions ([Config.FilesystemOpts],

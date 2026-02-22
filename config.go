@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 )
@@ -80,28 +79,6 @@ func (c *Config) ToJSON(w io.Writer) error {
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "  ")
 	return enc.Encode(c)
-}
-
-// LoadConfig reads the configuration from a JSON file.
-func LoadConfig(path string) (*Config, error) {
-	// Clean the path to ensure it is normalized.
-	// G304: Potential file inclusion via variable.
-	// This is a CLI tool and the user is expected to provide a path to the config file.
-	// #nosec G304
-	f, err := os.Open(filepath.Clean(path))
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		_ = f.Close()
-	}()
-
-	cfg := &Config{}
-	if err := cfg.FromJSON(f); err != nil {
-		return nil, err
-	}
-
-	return cfg, nil
 }
 
 // Validate checks the configuration for errors and initializes the option functions.
