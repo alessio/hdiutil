@@ -127,8 +127,10 @@
 //
 // # Dry-run mode
 //
-// Setting [Config.Simulate] logs every external command without executing it,
-// which is useful for previewing the hdiutil invocations that would be made.
+// Passing the [Simulate] option to [New] logs every external command without
+// executing it, which is useful for previewing the hdiutil invocations that
+// would be made. Simulate mode can also be toggled at runtime via
+// [Runner.SetSimulate].
 //
 // # Input sanitization
 //

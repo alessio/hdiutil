@@ -23,8 +23,8 @@ for creating, manipulating, and signing DMG disk images.
 | **Code signing & notarization** | Integrated `codesign` and Apple `notarytool`/`stapler` support |
 | **JSON configuration** | Load/save `Config` from JSON files for CI/CD pipelines |
 | **Input sanitization** | Rejects null bytes and dash-prefixed paths to prevent argument injection |
-| **Dry-run mode** | Preview all `hdiutil` invocations without executing them |
-| **Testable** | Typed `CommandExecutor` interface with `WithExecutor` option for mock injection |
+| **Dry-run mode** | `Simulate()` option previews all `hdiutil` invocations without executing them |
+| **Testable** | Typed `CommandExecutor` interface with `WithExecutor` and `Simulate` options for mock injection |
 
 ## Installation
 
