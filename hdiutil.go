@@ -351,6 +351,9 @@ type Runner struct {
 func (r *Runner) Setup() error {
 	return r.init()
 }
+
+// SetSimulate enables or disables simulate mode at runtime.
+// When enabled, all external commands are logged but not executed.
 func (r *Runner) SetSimulate(simulate bool) {
 	r.simulate = simulate
 }
