@@ -295,6 +295,13 @@ func WithExecutor(e CommandExecutor) Option {
 	}
 }
 
+// Simulate enables simulate mode.
+func Simulate() Option {
+	return func(r *Runner) {
+		r.simulate = true
+	}
+}
+
 // New creates a new Runner with the provided configuration.
 // The returned Runner must have Setup called before use.
 func New(c *Config, opts ...Option) *Runner {
@@ -321,6 +328,7 @@ type Runner struct {
 	volNameOpt  string
 	signOpt     string
 	notarizeOpt string
+	simulate    bool
 
 	srcDir   string
 	tmpDir   string
@@ -340,6 +348,9 @@ type Runner struct {
 // Returns an error if validation fails or temporary directory creation fails.
 func (r *Runner) Setup() error {
 	return r.init()
+}
+func (r *Runner) SetSimulate(simulate bool) {
+	r.simulate = simulate
 }
 
 // Cleanup removes temporary files and directories created during the DMG build process.
@@ -369,7 +380,7 @@ func (r *Runner) Start() error {
 // The image is attached with -nobrowse (hidden from Finder) and -noverify flags.
 // Returns ErrMountImage if it fails or the mount point cannot be determined.
 func (r *Runner) AttachDiskImage() error {
-	if r.Simulate {
+	if r.simulate {
 		r.mountDir = filepath.Join(r.tmpDir, "SIMULATED_MOUNT")
 		return nil
 	}
@@ -391,7 +402,7 @@ func (r *Runner) AttachDiskImage() error {
 // DetachDiskImage unmounts the disk image after fixing file permissions.
 // Should be called after all modifications to the mounted volume are complete.
 func (r *Runner) DetachDiskImage() error {
-	if r.Simulate {
+	if r.simulate {
 		verboseLog.Println("Simulating detach of disk image")
 		return nil
 	}
@@ -595,7 +606,7 @@ func (r *Runner) fixPermissions() error {
 
 func (r *Runner) runHdiutil(args ...string) error {
 	verboseLog.Println("Running 'hdiutil", args)
-	if r.Simulate {
+	if r.simulate {
 		return nil
 	}
 	return r.executor.Hdiutil(args...)
@@ -603,7 +614,7 @@ func (r *Runner) runHdiutil(args ...string) error {
 
 func (r *Runner) runHdiutilOutput(args ...string) (string, error) {
 	verboseLog.Println("Running 'hdiutil", args)
-	if r.Simulate {
+	if r.simulate {
 		return "", nil
 	}
 	return r.executor.HdiutilOutput(args...)
@@ -611,7 +622,7 @@ func (r *Runner) runHdiutilOutput(args ...string) (string, error) {
 
 func (r *Runner) runCodesign(args ...string) error {
 	verboseLog.Println("Running 'codesign", args)
-	if r.Simulate {
+	if r.simulate {
 		return nil
 	}
 	return r.executor.Codesign(args...)
@@ -619,7 +630,7 @@ func (r *Runner) runCodesign(args ...string) error {
 
 func (r *Runner) runXcrun(args ...string) error {
 	verboseLog.Println("Running 'xcrun", args)
-	if r.Simulate {
+	if r.simulate {
 		return nil
 	}
 	return r.executor.Xcrun(args...)
@@ -627,7 +638,7 @@ func (r *Runner) runXcrun(args ...string) error {
 
 func (r *Runner) runXcrunOutput(args ...string) (string, error) {
 	verboseLog.Println("Running 'xcrun", args)
-	if r.Simulate {
+	if r.simulate {
 		return "", nil
 	}
 	return r.executor.XcrunOutput(args...)
@@ -635,7 +646,7 @@ func (r *Runner) runXcrunOutput(args ...string) (string, error) {
 
 func (r *Runner) runChmod(args ...string) error {
 	verboseLog.Println("Running 'chmod", args)
-	if r.Simulate {
+	if r.simulate {
 		return nil
 	}
 	return r.executor.Chmod(args...)
@@ -643,7 +654,7 @@ func (r *Runner) runChmod(args ...string) error {
 
 func (r *Runner) runBless(args ...string) error {
 	verboseLog.Println("Running 'bless", args)
-	if r.Simulate {
+	if r.simulate {
 		return nil
 	}
 	return r.executor.Bless(args...)

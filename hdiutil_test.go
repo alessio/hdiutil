@@ -14,8 +14,7 @@ import (
 // It fails the test immediately if Setup returns an error.
 func setupSimRunner(t *testing.T, cfg *hdiutil.Config) *hdiutil.Runner {
 	t.Helper()
-	cfg.Simulate = true
-	r := hdiutil.New(cfg)
+	r := hdiutil.New(cfg, hdiutil.Simulate())
 	t.Cleanup(r.Cleanup)
 	if err := r.Setup(); err != nil {
 		t.Fatalf("Setup() error = %v", err)
@@ -160,10 +159,9 @@ func TestImageFormats(t *testing.T) {
 				SourceDir:   "test",
 				OutputPath:  "test.dmg",
 				ImageFormat: tt.format,
-				Simulate:    true,
 			}
 
-			r := hdiutil.New(&cfg)
+			r := hdiutil.New(&cfg, hdiutil.Simulate())
 			t.Cleanup(r.Cleanup)
 
 			err := r.Setup()
@@ -196,10 +194,9 @@ func TestFilesystems(t *testing.T) {
 				SourceDir:  "test",
 				OutputPath: "test.dmg",
 				FileSystem: tt.fs,
-				Simulate:   true,
 			}
 
-			r := hdiutil.New(&cfg)
+			r := hdiutil.New(&cfg, hdiutil.Simulate())
 			t.Cleanup(r.Cleanup)
 
 			err := r.Setup()
@@ -245,7 +242,6 @@ func TestVolumeNameGeneration(t *testing.T) {
 				SourceDir:  "test",
 				OutputPath: tt.outputPath,
 				VolumeName: tt.volumeName,
-				Simulate:   true,
 			}
 
 			err := cfg.Validate()
@@ -281,7 +277,6 @@ func TestVolumeSizeOpts(t *testing.T) {
 				SourceDir:    "test",
 				OutputPath:   "test.dmg",
 				VolumeSizeMb: tt.sizeMb,
-				Simulate:     true,
 			}
 
 			err := cfg.Validate()
@@ -306,7 +301,6 @@ func TestStartWithoutSetup(t *testing.T) {
 	cfg := hdiutil.Config{
 		SourceDir:  "test",
 		OutputPath: "test.dmg",
-		Simulate:   true,
 	}
 
 	r := hdiutil.New(&cfg)
@@ -459,10 +453,9 @@ func TestCleanup(t *testing.T) {
 	cfg := hdiutil.Config{
 		SourceDir:  "test",
 		OutputPath: "test.dmg",
-		Simulate:   true,
 	}
 
-	r := hdiutil.New(&cfg)
+	r := hdiutil.New(&cfg, hdiutil.Simulate())
 
 	if err := r.Setup(); err != nil {
 		t.Fatalf("Setup() error = %v", err)
@@ -506,7 +499,6 @@ func TestInit(t *testing.T) {
 			FileSystem:      "APFS",
 			SigningIdentity: "",
 			ImageFormat:     "ULFO",
-			Simulate:        true,
 			SourceDir:       "test",
 		},
 		{
@@ -515,7 +507,6 @@ func TestInit(t *testing.T) {
 			FileSystem:       "APFS",
 			SigningIdentity:  "",
 			HDIUtilVerbosity: 1,
-			Simulate:         true,
 			SourceDir:        "test",
 		},
 	}
@@ -534,7 +525,7 @@ func TestInit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t2 *testing.T) {
-			r := hdiutil.New(tt.args.c)
+			r := hdiutil.New(tt.args.c, hdiutil.Simulate())
 			t2.Cleanup(r.Cleanup)
 			if err := r.Setup(); (err != nil) != tt.wantErr {
 				t2.Errorf("Init() error = %v, wantErr %v", err, tt.wantErr)
