@@ -290,14 +290,16 @@ func (e *realCommandExecutor) Bless(args ...string) error {
 // Option is a functional option for configuring a Runner.
 type Option func(*Runner)
 
-// WithExecutor sets a custom command executor for testing.
+// WithExecutor returns an Option that sets the Runner's CommandExecutor to the provided executor.
+// Useful for injecting a mock or custom executor (for testing or alternative command implementations).
 func WithExecutor(e CommandExecutor) Option {
 	return func(r *Runner) {
 		r.executor = e
 	}
 }
 
-// Simulate enables simulate mode.
+// Simulate returns an Option that enables simulate mode on a Runner.
+// When enabled, the Runner skips executing external commands and operates in dry-run mode.
 func Simulate() Option {
 	return func(r *Runner) {
 		r.simulate = true
@@ -305,7 +307,9 @@ func Simulate() Option {
 }
 
 // New creates a new Runner with the provided configuration.
-// The returned Runner must have Setup called before use.
+// New creates a Runner configured with the provided Config and applies any functional options.
+// It initializes the Runner with a default realCommandExecutor. The returned Runner is not
+// initialized for operation; call Setup on it before use.
 func New(c *Config, opts ...Option) *Runner {
 	r := &Runner{
 		Config:   c,
