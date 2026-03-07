@@ -242,10 +242,9 @@ func ExampleNew() {
 		SourceDir:  "./dist",
 		OutputPath: "MyApp.dmg",
 		VolumeName: "My App",
-		Simulate:   true,
 	}
 
-	runner := hdiutil.New(cfg)
+	runner := hdiutil.New(cfg, hdiutil.Simulate())
 	defer runner.Cleanup()
 
 	if err := runner.Setup(); err != nil {
@@ -268,10 +267,9 @@ func ExampleNew_sandboxSafe() {
 		SourceDir:   "./dist",
 		OutputPath:  "MyApp.dmg",
 		SandboxSafe: true,
-		Simulate:    true,
 	}
 
-	runner := hdiutil.New(cfg)
+	runner := hdiutil.New(cfg, hdiutil.Simulate())
 	defer runner.Cleanup()
 
 	if err := runner.Setup(); err != nil {
@@ -296,10 +294,9 @@ func ExampleNew_fullWorkflow() {
 		VolumeName:  "My App",
 		ImageFormat: "UDBZ",
 		FileSystem:  "HFS+",
-		Simulate:    true,
 	}
 
-	runner := hdiutil.New(cfg)
+	runner := hdiutil.New(cfg, hdiutil.Simulate())
 	defer runner.Cleanup()
 
 	if err := runner.Setup(); err != nil {
@@ -341,10 +338,9 @@ func ExampleSetLogWriter() {
 	cfg := &hdiutil.Config{
 		SourceDir:  "./dist",
 		OutputPath: "MyApp.dmg",
-		Simulate:   true,
 	}
 
-	runner := hdiutil.New(cfg)
+	runner := hdiutil.New(cfg, hdiutil.Simulate())
 	defer runner.Cleanup()
 
 	_ = runner.Setup()
@@ -354,6 +350,55 @@ func ExampleSetLogWriter() {
 	fmt.Println(buf.Len() > 0)
 	// Output:
 	// true
+}
+
+func ExampleSimulate() {
+	cfg := &hdiutil.Config{
+		SourceDir:  "./dist",
+		OutputPath: "MyApp.dmg",
+		VolumeName: "My App",
+	}
+
+	runner := hdiutil.New(cfg, hdiutil.Simulate())
+	defer runner.Cleanup()
+
+	if err := runner.Setup(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// All commands are logged but not executed.
+	if err := runner.Start(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println("ok")
+	// Output:
+	// ok
+}
+
+func ExampleRunner_SetSimulate() {
+	cfg := &hdiutil.Config{
+		SourceDir:  "./dist",
+		OutputPath: "MyApp.dmg",
+	}
+
+	runner := hdiutil.New(cfg, hdiutil.Simulate())
+	defer runner.Cleanup()
+
+	if err := runner.Setup(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Toggle simulate mode at runtime.
+	runner.SetSimulate(false)
+	runner.SetSimulate(true)
+
+	fmt.Println("ok")
+	// Output:
+	// ok
 }
 
 func ExampleWithExecutor() {

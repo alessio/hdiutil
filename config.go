@@ -39,9 +39,6 @@ type Config struct {
 	// SourceDir is the directory containing files to include in the DMG.
 	SourceDir string `json:"source_dir,omitempty"`
 
-	// Simulate enables dry-run mode without actually creating the DMG.
-	Simulate bool `json:"simulate,omitempty"`
-
 	valid bool
 
 	// FilesystemOpts returns the hdiutil arguments for the configured filesystem.

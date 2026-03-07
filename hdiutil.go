@@ -127,8 +127,10 @@
 //
 // # Dry-run mode
 //
-// Setting [Config.Simulate] logs every external command without executing it,
-// which is useful for previewing the hdiutil invocations that would be made.
+// Passing the [Simulate] option to [New] logs every external command without
+// executing it, which is useful for previewing the hdiutil invocations that
+// would be made. Simulate mode can also be toggled at runtime via
+// [Runner.SetSimulate].
 //
 // # Input sanitization
 //
@@ -288,15 +290,26 @@ func (e *realCommandExecutor) Bless(args ...string) error {
 // Option is a functional option for configuring a Runner.
 type Option func(*Runner)
 
-// WithExecutor sets a custom command executor for testing.
+// WithExecutor returns an Option that sets the Runner's CommandExecutor to the provided executor.
+// Useful for injecting a mock or custom executor (for testing or alternative command implementations).
 func WithExecutor(e CommandExecutor) Option {
 	return func(r *Runner) {
 		r.executor = e
 	}
 }
 
+// Simulate returns an Option that enables simulate mode on a Runner.
+// When enabled, the Runner skips executing external commands and operates in dry-run mode.
+func Simulate() Option {
+	return func(r *Runner) {
+		r.simulate = true
+	}
+}
+
 // New creates a new Runner with the provided configuration.
-// The returned Runner must have Setup called before use.
+// New creates a Runner configured with the provided Config and applies any functional options.
+// It initializes the Runner with a default realCommandExecutor. The returned Runner is not
+// initialized for operation; call Setup on it before use.
 func New(c *Config, opts ...Option) *Runner {
 	r := &Runner{
 		Config:   c,
@@ -321,6 +334,7 @@ type Runner struct {
 	volNameOpt  string
 	signOpt     string
 	notarizeOpt string
+	simulate    bool
 
 	srcDir   string
 	tmpDir   string
@@ -340,6 +354,12 @@ type Runner struct {
 // Returns an error if validation fails or temporary directory creation fails.
 func (r *Runner) Setup() error {
 	return r.init()
+}
+
+// SetSimulate enables or disables simulate mode at runtime.
+// When enabled, all external commands are logged but not executed.
+func (r *Runner) SetSimulate(simulate bool) {
+	r.simulate = simulate
 }
 
 // Cleanup removes temporary files and directories created during the DMG build process.
@@ -369,7 +389,7 @@ func (r *Runner) Start() error {
 // The image is attached with -nobrowse (hidden from Finder) and -noverify flags.
 // Returns ErrMountImage if it fails or the mount point cannot be determined.
 func (r *Runner) AttachDiskImage() error {
-	if r.Simulate {
+	if r.simulate {
 		r.mountDir = filepath.Join(r.tmpDir, "SIMULATED_MOUNT")
 		return nil
 	}
@@ -391,7 +411,7 @@ func (r *Runner) AttachDiskImage() error {
 // DetachDiskImage unmounts the disk image after fixing file permissions.
 // Should be called after all modifications to the mounted volume are complete.
 func (r *Runner) DetachDiskImage() error {
-	if r.Simulate {
+	if r.simulate {
 		verboseLog.Println("Simulating detach of disk image")
 		return nil
 	}
@@ -595,7 +615,7 @@ func (r *Runner) fixPermissions() error {
 
 func (r *Runner) runHdiutil(args ...string) error {
 	verboseLog.Println("Running 'hdiutil", args)
-	if r.Simulate {
+	if r.simulate {
 		return nil
 	}
 	return r.executor.Hdiutil(args...)
@@ -603,7 +623,7 @@ func (r *Runner) runHdiutil(args ...string) error {
 
 func (r *Runner) runHdiutilOutput(args ...string) (string, error) {
 	verboseLog.Println("Running 'hdiutil", args)
-	if r.Simulate {
+	if r.simulate {
 		return "", nil
 	}
 	return r.executor.HdiutilOutput(args...)
@@ -611,7 +631,7 @@ func (r *Runner) runHdiutilOutput(args ...string) (string, error) {
 
 func (r *Runner) runCodesign(args ...string) error {
 	verboseLog.Println("Running 'codesign", args)
-	if r.Simulate {
+	if r.simulate {
 		return nil
 	}
 	return r.executor.Codesign(args...)
@@ -619,7 +639,7 @@ func (r *Runner) runCodesign(args ...string) error {
 
 func (r *Runner) runXcrun(args ...string) error {
 	verboseLog.Println("Running 'xcrun", args)
-	if r.Simulate {
+	if r.simulate {
 		return nil
 	}
 	return r.executor.Xcrun(args...)
@@ -627,7 +647,7 @@ func (r *Runner) runXcrun(args ...string) error {
 
 func (r *Runner) runXcrunOutput(args ...string) (string, error) {
 	verboseLog.Println("Running 'xcrun", args)
-	if r.Simulate {
+	if r.simulate {
 		return "", nil
 	}
 	return r.executor.XcrunOutput(args...)
@@ -635,7 +655,7 @@ func (r *Runner) runXcrunOutput(args ...string) (string, error) {
 
 func (r *Runner) runChmod(args ...string) error {
 	verboseLog.Println("Running 'chmod", args)
-	if r.Simulate {
+	if r.simulate {
 		return nil
 	}
 	return r.executor.Chmod(args...)
@@ -643,7 +663,7 @@ func (r *Runner) runChmod(args ...string) error {
 
 func (r *Runner) runBless(args ...string) error {
 	verboseLog.Println("Running 'bless", args)
-	if r.Simulate {
+	if r.simulate {
 		return nil
 	}
 	return r.executor.Bless(args...)

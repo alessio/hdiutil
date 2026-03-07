@@ -22,7 +22,6 @@ func TestConfig_JSON(t *testing.T) {
 		HDIUtilVerbosity:    2,
 		OutputPath:          "test.dmg",
 		SourceDir:           "src",
-		Simulate:            true,
 	}
 
 	// Test ToJSON
@@ -71,9 +70,6 @@ func TestConfig_JSON(t *testing.T) {
 	if decoded.SourceDir != original.SourceDir {
 		t.Errorf("SourceDir mismatch: expected %q, got %q", original.SourceDir, decoded.SourceDir)
 	}
-	if decoded.Simulate != original.Simulate {
-		t.Errorf("Simulate mismatch: expected %v, got %v", original.Simulate, decoded.Simulate)
-	}
 }
 
 func TestConfig_FromJSON_Partial(t *testing.T) {
@@ -97,4 +93,3 @@ func TestConfig_FromJSON_Partial(t *testing.T) {
 		t.Errorf("Expected SourceDir 'src', got '%s'", cfg.SourceDir)
 	}
 }
-

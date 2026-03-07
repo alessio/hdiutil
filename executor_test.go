@@ -641,10 +641,13 @@ func TestDetachDiskImage_SimulateMode(t *testing.T) {
 	cfg := &hdiutil.Config{
 		SourceDir:  t.TempDir(),
 		OutputPath: "test.dmg",
-		Simulate:   true,
 	}
 
-	r := newRunner(t, cfg, mock)
+	r := hdiutil.New(cfg, hdiutil.WithExecutor(mock), hdiutil.Simulate())
+	t.Cleanup(r.Cleanup)
+	if err := r.Setup(); err != nil {
+		t.Fatalf("Setup() error = %v", err)
+	}
 
 	if err := r.AttachDiskImage(); err != nil {
 		t.Fatalf("AttachDiskImage() error = %v", err)
@@ -695,4 +698,3 @@ func TestAttachDiskImage_MountPointWithWhitespace(t *testing.T) {
 		t.Errorf("mount dir should be trimmed, got %q", lastArg)
 	}
 }
-
