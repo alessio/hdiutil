@@ -216,8 +216,14 @@ var (
 	verboseLog *log.Logger
 )
 
+var HdiutilExe string
+
 func init() {
 	verboseLog = log.New(io.Discard, "hdiutil: ", 0)
+
+	if p, err := exec.LookPath("hdiutil"); err == nil {
+		HdiutilExe = p
+	}
 }
 
 // SetLogWriter configures the output writer for verbose logging.
@@ -240,17 +246,24 @@ type CommandExecutor interface {
 	Bless(args ...string) error
 }
 
-type realCommandExecutor struct{}
+type realCommandExecutor struct {
+}
 
 func (e *realCommandExecutor) Hdiutil(args ...string) error {
-	cmd := exec.Command("hdiutil", args...)
+	if HdiutilExe == "" {
+		return fmt.Errorf("HdiutilExe not set")
+	}
+	cmd := exec.Command(HdiutilExe, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
 
 func (e *realCommandExecutor) HdiutilOutput(args ...string) (string, error) {
-	output, err := exec.Command("hdiutil", args...).CombinedOutput()
+	if HdiutilExe == "" {
+		return "", fmt.Errorf("HdiutilExe not set")
+	}
+	output, err := exec.Command(HdiutilExe, args...).CombinedOutput()
 	return string(output), err
 }
 
