@@ -16,12 +16,6 @@ type OptFn[T string | []string] func() T
 type Config struct {
 	// VolumeName is the name of the mounted volume. If empty, it defaults to the output filename without extension.
 	VolumeName string `json:"volume_name,omitempty"`
-	// VolumeSizeMb specifies the volume size in megabytes. If zero, hdiutil determines the size automatically.
-	VolumeSizeMb int64 `json:"volume_size_mb,omitempty"`
-	// SandboxSafe enables sandbox-safe mode. Cannot be used with APFS filesystem.
-	SandboxSafe bool `json:"sandbox_safe,omitempty"`
-	// Bless marks the volume as bootable.
-	Bless bool `json:"bless,omitempty"`
 	// FileSystem specifies the filesystem type (e.g., "HFS+", "APFS"). Defaults to "HFS+".
 	FileSystem string `json:"filesystem,omitempty"`
 	// SigningIdentity specifies the signing identity to use.
@@ -30,16 +24,15 @@ type Config struct {
 	NotarizeCredentials string `json:"notarize_credentials,omitempty"`
 	// ImageFormat specifies the DMG format (e.g., "UDZO", "UDBZ", "ULFO", "ULMO"). Defaults to "UDZO".
 	ImageFormat string `json:"image_format,omitempty"`
-
-	// HDIUtilVerbosity controls the verbosity level of hdiutil output.
-	HDIUtilVerbosity int `json:"hdiutil_verbosity,omitempty"`
-
 	// OutputPath is the destination path for the created DMG file. Must have .dmg extension.
 	OutputPath string `json:"output_path,omitempty"`
 	// SourceDir is the directory containing files to include in the DMG.
 	SourceDir string `json:"source_dir,omitempty"`
 
-	valid bool
+	// VolumeSizeMb specifies the volume size in megabytes. If zero, hdiutil determines the size automatically.
+	VolumeSizeMb int64 `json:"volume_size_mb,omitempty"`
+	// HDIUtilVerbosity controls the verbosity level of hdiutil output.
+	HDIUtilVerbosity int `json:"hdiutil_verbosity,omitempty"`
 
 	// FilesystemOpts returns the hdiutil arguments for the configured filesystem.
 	// Only available after calling Validate.
@@ -53,6 +46,13 @@ type Config struct {
 	// VolumeNameOpt returns the resolved volume name.
 	// Only available after calling Validate.
 	VolumeNameOpt OptFn[string] `json:"-"`
+
+	// SandboxSafe enables sandbox-safe mode. Cannot be used with APFS filesystem.
+	SandboxSafe bool `json:"sandbox_safe,omitempty"`
+	// Bless marks the volume as bootable.
+	Bless bool `json:"bless,omitempty"`
+
+	valid bool
 }
 
 // FromJSON populates the Config from a JSON reader.

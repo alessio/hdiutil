@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"unsafe"
 
 	"al.essio.dev/pkg/hdiutil"
 )
@@ -811,3 +812,25 @@ func TestConfig_VolumeNameFromComplexPath(t *testing.T) {
 		})
 	}
 }
+
+func TestConfig_FieldAlignment(t *testing.T) {
+	t.Parallel()
+	var c hdiutil.Config
+	t.Logf("Config size = %d", unsafe.Sizeof(c))
+	t.Logf("VolumeName offset = %d", unsafe.Offsetof(c.VolumeName))
+	t.Logf("VolumeSizeMb offset = %d", unsafe.Offsetof(c.VolumeSizeMb))
+	t.Logf("SandboxSafe offset = %d", unsafe.Offsetof(c.SandboxSafe))
+	t.Logf("Bless offset = %d", unsafe.Offsetof(c.Bless))
+	t.Logf("FileSystem offset = %d", unsafe.Offsetof(c.FileSystem))
+	t.Logf("SigningIdentity offset = %d", unsafe.Offsetof(c.SigningIdentity))
+	t.Logf("NotarizeCredentials offset = %d", unsafe.Offsetof(c.NotarizeCredentials))
+	t.Logf("ImageFormat offset = %d", unsafe.Offsetof(c.ImageFormat))
+	t.Logf("HDIUtilVerbosity offset = %d", unsafe.Offsetof(c.HDIUtilVerbosity))
+	t.Logf("OutputPath offset = %d", unsafe.Offsetof(c.OutputPath))
+	t.Logf("SourceDir offset = %d", unsafe.Offsetof(c.SourceDir))
+	t.Logf("FilesystemOpts offset = %d", unsafe.Offsetof(c.FilesystemOpts))
+	t.Logf("ImageFormatOpts offset = %d", unsafe.Offsetof(c.ImageFormatOpts))
+	t.Logf("VolumeSizeOpts offset = %d", unsafe.Offsetof(c.VolumeSizeOpts))
+	t.Logf("VolumeNameOpt offset = %d", unsafe.Offsetof(c.VolumeNameOpt))
+}
+
