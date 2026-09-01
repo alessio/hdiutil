@@ -1,4 +1,4 @@
 module al.essio.dev/pkg/hdiutil
 
-go 1.26
+go 1.27
 
